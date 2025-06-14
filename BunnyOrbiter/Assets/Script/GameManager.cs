@@ -1,21 +1,35 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
+    
+    [Header("Gameplay")]
+    public int currentScore;
+    public int collectedCoins;
+    public int collectedFood;
+    public float survivalTime;
 
-    // Player progess
-    public int coins;
-    public int carrots;
-    public int cabbages;
+    // player progress
+    public int totalCoins;
+    public int totalCarrots;
+    public int totalCabbages;
 
-    private void Awake()
+    [Header("UI")]
+    public GameObject gameOverPanel;
+    public TMPro.TextMeshProUGUI scoreText;
+    public TMPro.TextMeshProUGUI timeText;
+    public TMPro.TextMeshProUGUI foodText;
+
+    private bool isGameOver;
+
+    void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
-            LoadData();
+            Time.timeScale = 1f;
         }
         else
         {
@@ -23,28 +37,89 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void OnCollectibleGathered(Collectible collectible)
+    void Update()
+    {
+        if (!isGameOver)
+        {
+            survivalTime += Time.deltaTime;
+            UpdateUI();
+        }
+    }
+
+    public void CollectItem(Collectible.Type type, int value)
+    {
+        switch (type)
+        {
+            case Collectible.Type.Carrot:
+            case Collectible.Type.Cabbage:
+                collectedFood += value;
+                break;
+            case Collectible.Type.Coin:
+                collectedCoins += value;
+                currentScore += value;
+                break;
+        }
+    }
+
+    public void PlayerCrashed()
+    {
+        if (isGameOver) return;
+        isGameOver = true;
+        gameOverPanel.SetActive(true);
+        Time.timeScale = 0.5f; // Slow-mo effect
+    }
+
+    public void PlayerFellOff()
+    {
+        if (isGameOver) return;
+        isGameOver = true;
+        gameOverPanel.SetActive(true);
+        Time.timeScale = 0f;
+    }
+
+    void UpdateUI()
+    {
+        scoreText.text = $"Score: {currentScore}";
+        timeText.text = $"Time: {survivalTime.ToString("F1")}s";
+        foodText.text = $"Food: {collectedFood}";
+    }
+
+    public void RetryGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void ReturnToMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
+
+    public void HandleCollection(Collectible collectible)
     {
         switch (collectible.type)
         {
-            case Collectible.Type.Carrot: carrots += collectible.value; break;
-            case Collectible.Type.Cabbage: cabbages += collectible.value; break;
-            case Collectible.Type.Coin: coins += collectible.value; break;
+            case Collectible.Type.Carrot:
+                totalCarrots += collectible.value;
+                break;
+            case Collectible.Type.Cabbage:
+                totalCabbages += collectible.value;
+                break;
+            case Collectible.Type.Coin:
+                totalCoins += collectible.value;
+                break;
         }
-        SaveData();
+        
+        Debug.Log($"Collected: {collectible.type} (Total: {GetTotalForType(collectible.type)})");
     }
 
-    private void SaveData()
+    private int GetTotalForType(Collectible.Type type)
     {
-        PlayerPrefs.SetInt("Coins", coins);
-        PlayerPrefs.SetInt("Carrots", carrots);
-        PlayerPrefs.SetInt("Cabbages", cabbages);
-    }
-    
-    private void LoadData()
-    {
-        coins = PlayerPrefs.GetInt("Coins", 0);
-        carrots = PlayerPrefs.GetInt("Carrots", 0);
-        cabbages = PlayerPrefs.GetInt("Cabbages", 0);
+        return type switch
+        {
+            Collectible.Type.Carrot => totalCarrots,
+            Collectible.Type.Cabbage => totalCabbages,
+            Collectible.Type.Coin => totalCoins,
+            _ => 0
+        };
     }
 }

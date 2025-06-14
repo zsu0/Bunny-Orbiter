@@ -10,8 +10,10 @@ public class Collectible : MonoBehaviour
     {
         if (!other.CompareTag("Player")) return;
 
-        // Minimal event - let GameManager handlee logic
-        GameManager.Instance.OnCollectibleGathered(this);
+        // Notify GameManager
+        GameManager.Instance.HandleCollection(this);
+        
+        // Visual/audio feedback would go here
         Destroy(gameObject);
     }
 }
