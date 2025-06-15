@@ -11,9 +11,15 @@ public class MainMenuManager : MonoBehaviour
     public void OnPlayButtonClicked()
     {
         Debug.Log("PLAY button clicked!");
-        // For now, directly go to HomeScene.
-        // Later, add logic for StoryScene if it's the first time.
-        SceneManager.LoadScene("HomeScene"); 
+
+        if (StorySceneManager.ShouldShowStory())
+        {
+            SceneManager.LoadScene("StoryScene"); 
+        }
+        else
+        {
+            SceneManager.LoadScene("HomeScene");
+        }
     }
 
     public void QuitGame()
