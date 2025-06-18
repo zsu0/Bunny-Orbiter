@@ -18,6 +18,6 @@ MonoBehaviour:
   isUnlockedByDefault: 1
   pages:
   - dialogueText: The first actual text 5;04
-    pagePicture: {fileID: 0}
+    pagePicture: {fileID: 7482667652216324306, guid: 0af2848813a4fff43b535386ac524235, type: 3}
   - dialogueText: 5-05
-    pagePicture: {fileID: 0}
+    pagePicture: {fileID: 7482667652216324306, guid: 0af2848813a4fff43b535386ac524235, type: 3}

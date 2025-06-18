@@ -333,4 +333,17 @@ public class HomeSceneManager : MonoBehaviour
             levelDisplayTMP.text = "LEVEL " + level;
         }
     }
+
+    // StoryScene
+    public void LaunchStoryScene(string storyIDToLoad)
+    {
+        Debug.Log($"[HomeSceneManager] Launching StoryScene for Story ID: {storyIDToLoad}");
+
+        // Store the ID of the story to be shown page-by-page in PlayerPrefs
+        PlayerPrefs.SetString("SelectedStoryID", storyIDToLoad); // Use the same key as StorySceneManager
+        PlayerPrefs.Save();
+
+        // Load the StoryScene
+        SceneManager.LoadScene("StoryScene");
+    }
 }
